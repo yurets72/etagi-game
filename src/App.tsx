@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   TrendingUp,
@@ -42,6 +42,11 @@ interface Agent {
 }
 
 type FilterMode = 'all' | 'burned' | 'top' | 'newbie';
+
+interface Position {
+  x: number;
+  y: number;
+}
 
 // ─── Status config ──────────────────────────────────────
 const STATUS_CONFIG: Record<
@@ -104,20 +109,28 @@ function StatBar({
   );
 }
 
-// ─── Agent Avatar (on map) ───────────────────────────────
+// ─── Agent Avatar (on map, draggable) ────────────────────
+interface AgentAvatarProps {
+  agent: Agent;
+  index: number;
+  isSelected: boolean;
+  isDimmed: boolean;
+  isDragging: boolean;
+  onPointerDown: (e: React.PointerEvent, agentId: string) => void;
+  onPointerMove: (e: React.PointerEvent) => void;
+  onPointerUp: (e: React.PointerEvent) => void;
+}
+
 function AgentAvatar({
   agent,
   index,
   isSelected,
   isDimmed,
-  onClick,
-}: {
-  agent: Agent;
-  index: number;
-  isSelected: boolean;
-  isDimmed: boolean;
-  onClick: () => void;
-}) {
+  isDragging,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+}: AgentAvatarProps) {
   const statusCfg = STATUS_CONFIG[agent.status];
   const isBurned = agent.status === 'burned';
   const isYou = agent.id === 'rop';
@@ -125,15 +138,21 @@ function AgentAvatar({
 
   return (
     <div
-      className="absolute cursor-pointer transition-all duration-300"
+      className="absolute cursor-grab active:cursor-grabbing"
       style={{
         left: `${agent.x}%`,
         top: `${agent.y}%`,
-        transform: 'translate(-50%, -50%)',
+        transform: `translate(-50%, -50%) scale(${isDragging ? 1.1 : 1})`,
         opacity: isDimmed ? 0.3 : 1,
-        zIndex: 10,
+        zIndex: isDragging ? 1000 : 10,
+        transition: isDragging ? 'none' : 'opacity 0.3s, transform 0.15s',
+        touchAction: 'none',
+        userSelect: 'none',
       }}
-      onClick={onClick}
+      onPointerDown={(e) => onPointerDown(e, agent.id)}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
     >
       {/* Name bubble */}
       <div className="flex flex-col items-center gap-0.5 mb-1 pointer-events-none">
@@ -163,15 +182,16 @@ function AgentAvatar({
           width: 24,
           height: 6,
           bottom: -3,
-          background: 'rgba(0,0,0,0.3)',
+          background: isDragging ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
           filter: 'blur(2px)',
+          transition: 'background 0.15s',
         }}
       />
 
       {/* Avatar sprite */}
-      <div className={`relative ${bobClass}`}>
+      <div className={`relative ${isDragging ? '' : bobClass}`}>
         {/* Selection ring */}
-        {isSelected && (
+        {isSelected && !isDragging && (
           <div
             className="absolute inset-0 rounded-full animate-ping"
             style={{
@@ -473,8 +493,24 @@ function BackgroundMap() {
 // ─── Main App ───────────────────────────────────────────
 function App() {
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [positions, setPositions] = useState<Record<string, Position>>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterMode>('all');
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+
+  // Ref для хранения данных о drag (не вызывает ре-рендер)
+  const dragRef = useRef<{
+    agentId: string;
+    startPointerX: number;
+    startPointerY: number;
+    startAgentX: number;
+    startAgentY: number;
+    hasMoved: boolean;
+    mapRect: DOMRect | null;
+  } | null>(null);
+
+  // Ref на контейнер карты — нужен для расчёта процентов
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}mock-data.json`)
@@ -482,6 +518,88 @@ function App() {
       .then((data: Agent[]) => setAgents(data))
       .catch((err) => console.error('Failed to load mock data:', err));
   }, []);
+
+  // ─── Drag handlers ─────────────────────────────────────
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent, agentId: string) => {
+      const agent = agents.find((a) => a.id === agentId);
+      if (!agent || !mapContainerRef.current) return;
+
+      // Захватываем указатель, чтобы события шли к этому элементу
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
+      const currentPos = positions[agentId] ?? { x: agent.x, y: agent.y };
+      const mapRect = mapContainerRef.current.getBoundingClientRect();
+
+      dragRef.current = {
+        agentId,
+        startPointerX: e.clientX,
+        startPointerY: e.clientY,
+        startAgentX: currentPos.x,
+        startAgentY: currentPos.y,
+        hasMoved: false,
+        mapRect,
+      };
+      setDraggingId(agentId);
+    },
+    [agents, positions],
+  );
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    const drag = dragRef.current;
+    if (!drag || !drag.mapRect) return;
+
+    const dx = e.clientX - drag.startPointerX;
+    const dy = e.clientY - drag.startPointerY;
+
+    // Если смещение больше 5px — считаем это drag, а не клик
+    if (!drag.hasMoved && Math.abs(dx) + Math.abs(dy) < 5) return;
+    drag.hasMoved = true;
+
+    // Переводим пиксели в проценты от размера карты
+    const dxPercent = (dx / drag.mapRect.width) * 100;
+    const dyPercent = (dy / drag.mapRect.height) * 100;
+
+    const newX = Math.max(0, Math.min(100, drag.startAgentX + dxPercent));
+    const newY = Math.max(0, Math.min(100, drag.startAgentY + dyPercent));
+
+    setPositions((prev) => ({
+      ...prev,
+      [drag.agentId]: { x: newX, y: newY },
+    }));
+  }, []);
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      const drag = dragRef.current;
+      if (!drag) return;
+
+      // Если не двигали — это клик, открываем карточку
+      if (!drag.hasMoved) {
+        setSelectedId(drag.agentId);
+      }
+
+      dragRef.current = null;
+      setDraggingId(null);
+      // Освобождаем захват указателя
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    },
+    [],
+  );
+
+  // ─── Computed agents with positions ────────────────────
+  const agentsWithPositions = useMemo(
+    () =>
+      agents.map((a) => {
+        const pos = positions[a.id];
+        return pos ? { ...a, x: pos.x, y: pos.y } : a;
+      }),
+    [agents, positions],
+  );
 
   const counts = useMemo(
     () => ({
@@ -505,11 +623,13 @@ function App() {
   }, [filter, agents]);
 
   const sortedAgents = useMemo(() => {
-    if (filter === 'top') return [...agents].sort((a, b) => b.deals - a.deals);
-    return agents;
-  }, [filter, agents]);
+    if (filter === 'top')
+      return [...agentsWithPositions].sort((a, b) => b.deals - a.deals);
+    return agentsWithPositions;
+  }, [filter, agentsWithPositions]);
 
-  const selectedAgent = agents.find((a) => a.id === selectedId) || null;
+  const selectedAgent =
+    agentsWithPositions.find((a) => a.id === selectedId) || null;
 
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 overflow-hidden">
@@ -535,7 +655,10 @@ function App() {
       <div className="flex-1 flex overflow-hidden relative">
         {/* Map area — горизонтальный скролл на мобилке */}
         <div className="flex-1 relative overflow-x-auto overflow-y-hidden md:overflow-hidden">
-          <div className="relative h-full min-w-[1100px] md:min-w-0">
+          <div
+            ref={mapContainerRef}
+            className="relative h-full min-w-[1100px] md:min-w-0"
+          >
             <BackgroundMap />
 
             {/* Avatars */}
@@ -546,7 +669,10 @@ function App() {
                 index={i}
                 isSelected={selectedId === agent.id}
                 isDimmed={filter !== 'all' && !visibleIds.has(agent.id)}
-                onClick={() => setSelectedId(agent.id)}
+                isDragging={draggingId === agent.id}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
               />
             ))}
 
