@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-pixel: 'Pixelify Sans', monospace;
+  --font-vt: 'VT323', monospace;
+}
+
+* {
+  font-family: var(--font-pixel);
+}
+
+body {
+  margin: 0;
+  background: #1a1a2e;
+  overflow: hidden;
+}
+
+.font-vt {
+  font-family: var(--font-vt);
+}
+
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Idle bobbing animation for avatars */
+@keyframes idle-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes idle-bob-2 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes idle-bob-3 {
+  0%, 100% { transform: translateY(-1px); }
+  50% { transform: translateY(-3px); }
+}
+
+.idle-bob {
+  animation: idle-bob 2s ease-in-out infinite;
+}
+.idle-bob-2 {
+  animation: idle-bob-2 2.5s ease-in-out infinite;
+}
+.idle-bob-3 {
+  animation: idle-bob-3 1.8s ease-in-out infinite;
+}
+
+/* Burned agent effect */
+.burned-filter {
+  filter: hue-rotate(320deg) saturate(1.5);
+}
+
+@keyframes burned-glow {
+  0%, 100% { filter: hue-rotate(320deg) saturate(1.5) drop-shadow(0 0 4px rgba(255, 30, 30, 0.6)); }
+  50% { filter: hue-rotate(320deg) saturate(1.5) drop-shadow(0 0 8px rgba(255, 50, 50, 0.9)); }
+}
+
+.burned-glow {
+  animation: burned-glow 1.5s ease-in-out infinite;
+}
+
+/* "Ты" label pulse */
+@keyframes you-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.85; }
+}
+
+.you-pulse {
+  animation: you-pulse 1.2s ease-in-out infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.6);
+}
+
+/* Map zone labels */
+.zone-label {
+  font-family: var(--font-vt);
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+/* Status dot pulse */
+@keyframes status-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+  50% { box-shadow: 0 0 0 4px transparent; }
+}
+
+.status-dot-pulse {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* Card entrance handled by framer-motion */
+
+/* Pixel border utility */
+.pixel-border {
+  box-shadow:
+    0 0 0 2px #1a1a2e,
+    0 0 0 4px rgba(255,255,255,0.1);
+}
+
+/* Mini bar fill transition */
+.bar-fill {
+  transition: width 0.6s ease-out;
+}
