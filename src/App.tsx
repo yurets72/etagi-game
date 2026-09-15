@@ -182,13 +182,9 @@ function AgentAvatar({
           />
         )}
         <img
-          src={`/avatars/${agent.avatarFile}`}
-          alt={agent.name}
-          width={96}
-          height={96}
-          className={`pixelated ${isBurned ? 'burned-glow' : ''}`}
-          style={{ width: 96, height: 96 }}
-          draggable={false}
+  src={`/avatars/${agent.avatarFile}`}
+  alt={agent.name}
+  className="pixelated w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
         />
         {/* Status dot */}
         <div
