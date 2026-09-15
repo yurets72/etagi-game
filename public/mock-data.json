@@ -1,10 +1,10 @@
 [
   {
     "id": "rop",
-    "name": "Анна Соколова",
+    "name": "Юрий Девятков",
     "avatarFile": "rop.png",
-    "x": 35,
-    "y": 42,
+    "x": 12,
+    "y": 62,
     "status": "top",
     "hp": 92,
     "happiness": 88,
@@ -24,8 +24,8 @@
     "id": "agent_01",
     "name": "Дмитрий Волков",
     "avatarFile": "active-m.png",
-    "x": 18,
-    "y": 30,
+    "x": 22,
+    "y": 35,
     "status": "active",
     "hp": 78,
     "happiness": 72,
@@ -34,17 +34,17 @@
     "conversion": 25,
     "trend": "up",
     "calendar": [
-      { "time": "10:00", "title": "Показ студии, ЖК «Меридиан»" },
+      { "time": "10:00", "title": "Показ студии, ЖК Улаан Хото" },
       { "time": "13:00", "title": "Звонок: горячий лид" },
-      { "time": "15:30", "title": "Сделка: подписание ДКП" }
+      { "time": "15:30", "title": "Сделка: подписание ОД" }
     ]
   },
   {
     "id": "agent_02",
     "name": "Елена Морозова",
     "avatarFile": "burned-f.png",
-    "x": 28,
-    "y": 55,
+    "x": 30,
+    "y": 10,
     "status": "burned",
     "hp": 35,
     "happiness": 28,
@@ -62,8 +62,8 @@
     "id": "agent_03",
     "name": "Сергей Кузнецов",
     "avatarFile": "senior-m.png",
-    "x": 48,
-    "y": 35,
+    "x": 38,
+    "y": 55,
     "status": "active",
     "hp": 81,
     "happiness": 80,
@@ -72,7 +72,7 @@
     "conversion": 28,
     "trend": "up",
     "calendar": [
-      { "time": "10:30", "title": "Показ 2-к, ЖК «Парковый»" },
+      { "time": "10:30", "title": "Показ 2-к, ЖК Ёлки" },
       { "time": "14:30", "title": "Ипотечный консультант" },
       { "time": "16:00", "title": "Обзвон базы" }
     ]
@@ -80,59 +80,58 @@
   {
     "id": "agent_04",
     "name": "Ольга Васильева",
-    "avatarFile": "newbie.png",
-    "x": 62,
-    "y": 48,
-    "status": "newbie",
-    "hp": 55,
-    "happiness": 65,
+    "avatarFile": "active-f.png",
+    "x": 45,
+    "y": 25,
+    "status": "active",
+    "hp": 68,
+    "happiness": 72,
     "energy": 70,
-    "deals": 1,
-    "conversion": 12,
+    "deals": 4,
+    "conversion": 18,
     "trend": "up",
     "calendar": [
-      { "time": "09:00", "title": "Тренинг: техника продаж" },
-      { "time": "11:00", "title": "Стажировка: показ с наставником" },
-      { "time": "15:00", "title": "Изучение CRM" }
+      { "time": "10:00", "title": "Показ 1-к, ул. Гагарина" },
+      { "time": "13:00", "title": "Звонок: уточнение по ипотеке" },
+      { "time": "15:30", "title": "Встреча в офисе" }
     ]
   },
   {
     "id": "agent_05",
     "name": "Артём Лебедев",
-    "avatarFile": "active-f.png",
-    "x": 22,
-    "y": 65,
-    "status": "active",
-    "hp": 68,
-    "happiness": 60,
-    "energy": 82,
-    "deals": 5,
-    "conversion": 20,
+    "avatarFile": "active-m.png",
+    "x": 35,
+    "y": 68,
+    "status": "burned",
+    "hp": 42,
+    "happiness": 38,
+    "energy": 88,
+    "deals": 2,
+    "conversion": 9,
     "trend": "down",
     "calendar": [
-      { "time": "10:00", "title": "Показ дома, пос. Пригородный" },
-      { "time": "12:30", "title": "Сбор документов для сделки" },
-      { "time": "14:00", "title": "Показ 1-к, ул. Гагарина" },
-      { "time": "17:30", "title": "Обзвон холодной базы" }
+      { "time": "09:00", "title": "Разбор просрочек с РОП" },
+      { "time": "11:00", "title": "Жалоба клиента" },
+      { "time": "16:00", "title": "Контрольный звонок" }
     ]
   },
   {
     "id": "agent_06",
     "name": "Мария Петрова",
-    "avatarFile": "burned-m.png",
-    "x": 55,
-    "y": 65,
+    "avatarFile": "burned-f.png",
+    "x": 12,
+    "y": 14,
     "status": "burned",
-    "hp": 42,
-    "happiness": 35,
-    "energy": 95,
+    "hp": 40,
+    "happiness": 32,
+    "energy": 92,
     "deals": 1,
     "conversion": 6,
     "trend": "down",
     "calendar": [
-      { "time": "09:00", "title": "Разбор просрочек с РОП" },
-      { "time": "11:00", "title": "Жалоба клиента (срыв показа)" },
-      { "time": "16:00", "title": "Контрольный звонок" }
+      { "time": "09:30", "title": "Восстановление после выгорания" },
+      { "time": "12:00", "title": "Кофе-брейк, разговор с РОП" },
+      { "time": "17:00", "title": "Ранний уход домой" }
     ]
   },
   {
@@ -140,7 +139,7 @@
     "name": "Иван Смирнов",
     "avatarFile": "top-m.png",
     "x": 72,
-    "y": 30,
+    "y": 20,
     "status": "top",
     "hp": 88,
     "happiness": 90,
@@ -159,8 +158,8 @@
     "id": "agent_08",
     "name": "Ксения Орлова",
     "avatarFile": "senior-f.png",
-    "x": 40,
-    "y": 25,
+    "x": 12,
+    "y": 88,
     "status": "newbie",
     "hp": 60,
     "happiness": 70,
@@ -178,20 +177,20 @@
   {
     "id": "agent_09",
     "name": "Павел Новиков",
-    "avatarFile": "top-f.png",
-    "x": 78,
-    "y": 55,
-    "status": "active",
-    "hp": 72,
-    "happiness": 68,
-    "energy": 73,
-    "deals": 6,
-    "conversion": 22,
+    "avatarFile": "newbie.png",
+    "x": 65,
+    "y": 72,
+    "status": "newbie",
+    "hp": 55,
+    "happiness": 65,
+    "energy": 70,
+    "deals": 1,
+    "conversion": 12,
     "trend": "up",
     "calendar": [
-      { "time": "10:00", "title": "Показ 3-к, ЖК «Высота»" },
-      { "time": "13:30", "title": "Согласование ипотеки" },
-      { "time": "16:00", "title": "Обзвон тёплой базы" }
+      { "time": "10:00", "title": "Тренинг: техника продаж" },
+      { "time": "11:00", "title": "Стажировка: показ с наставником" },
+      { "time": "15:00", "title": "Изучение CRM" }
     ]
   }
 ]
