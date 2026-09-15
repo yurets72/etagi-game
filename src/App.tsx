@@ -59,7 +59,7 @@ const BOB_CLASSES = ['idle-bob', 'idle-bob-2', 'idle-bob-3'];
 // ─── Mini Bar (over avatar head) ─────────────────────────
 function MiniBar({ value, color }: { value: number; color: string }) {
   return (
-    <div className="w-12 h-1.5 bg-black/40 rounded-sm overflow-hidden border border-black/30">
+    <div className="w-10 sm:w-12 h-1.5 bg-black/40 rounded-sm overflow-hidden border border-black/30">
       <div
         className="h-full bar-fill rounded-sm"
         style={{ width: `${value}%`, backgroundColor: color }}
@@ -84,22 +84,22 @@ function StatBar({
 }) {
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-sm sm:text-base">
         <span className="flex items-center gap-1.5 text-slate-300">
           {icon}
           {label}
         </span>
-        <span className="font-vt text-lg" style={{ color }}>
+        <span className="font-vt text-lg sm:text-xl" style={{ color }}>
           {value}%
         </span>
       </div>
       <div className="h-3 bg-black/30 rounded-sm overflow-hidden border border-black/40">
         <div
-          className="h-full bar-fill rounded-sm flex items-center justify-end pr-1"
+          className="h-full bar-fill rounded-sm"
           style={{ width: `${value}%`, backgroundColor: color }}
         />
       </div>
-      <p className="text-[10px] text-slate-400 leading-snug">{description}</p>
+      <p className="text-xs sm:text-sm text-slate-400 leading-snug">{description}</p>
     </div>
   );
 }
@@ -138,12 +138,12 @@ function AgentAvatar({
       {/* Name bubble */}
       <div className="flex flex-col items-center gap-0.5 mb-1 pointer-events-none">
         {isYou && (
-          <div className="you-pulse px-2 py-0.5 bg-purple-500 text-white text-xs font-bold rounded-sm border-2 border-purple-300 shadow-lg mb-0.5 whitespace-nowrap">
+          <div className="you-pulse px-1.5 sm:px-2 py-0.5 bg-purple-500 text-white text-[10px] sm:text-xs font-bold rounded-sm border-2 border-purple-300 shadow-lg mb-0.5 whitespace-nowrap">
             Ты
           </div>
         )}
         <div
-          className="px-2 py-0.5 bg-slate-900/90 text-white text-xs rounded-sm border whitespace-nowrap"
+          className="px-1.5 sm:px-2 py-0.5 bg-slate-900/90 text-white text-[10px] sm:text-xs rounded-sm border whitespace-nowrap"
           style={{ borderColor: statusCfg.color, boxShadow: `0 2px 8px ${statusCfg.color}40` }}
         >
           {agent.name.split(' ')[0]}
@@ -160,9 +160,9 @@ function AgentAvatar({
       <div
         className="absolute left-1/2 -translate-x-1/2 rounded-full pointer-events-none"
         style={{
-          width: 32,
-          height: 8,
-          bottom: -4,
+          width: 24,
+          height: 6,
+          bottom: -3,
           background: 'rgba(0,0,0,0.3)',
           filter: 'blur(2px)',
         }}
@@ -176,23 +176,20 @@ function AgentAvatar({
             className="absolute inset-0 rounded-full animate-ping"
             style={{
               boxShadow: `0 0 0 3px ${statusCfg.color}, 0 0 12px ${statusCfg.color}80`,
-              width: 96,
-              height: 96,
             }}
           />
         )}
         <img
-  src={`/avatars/${agent.avatarFile}`}
-  alt={agent.name}
-  width={96}
-  height={96}
-  className="pixelated"
-  style={{ width: 96, height: 96 }}
-/>
+          src={`${import.meta.env.BASE_URL}avatars/${agent.avatarFile}`}
+          alt={agent.name}
+          className={`pixelated w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 ${
+            isBurned ? 'burned-glow' : ''
+          }`}
+          draggable={false}
+        />
         {/* Status dot */}
         <div
-          className={`absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 status-dot-pulse ${statusCfg.dot}`}
-          style={{ color: statusCfg.color }}
+          className={`absolute -top-1 -right-1 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-slate-900 status-dot-pulse ${statusCfg.dot}`}
         />
       </div>
     </div>
@@ -206,39 +203,53 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
 
   return (
     <motion.div
-      initial={{ x: 400, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 400, opacity: 0 }}
+      initial={{ y: 400, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 400, opacity: 0 }}
       transition={{ type: 'spring', damping: 22, stiffness: 260 }}
-      className="w-80 h-full bg-slate-900/95 backdrop-blur-md border-l-2 border-purple-500/50 overflow-y-auto relative"
-      style={{ zIndex: 100 }}
+      className="
+        w-full h-[75vh]
+        sm:w-80 sm:h-full md:w-96
+        bg-slate-900/95 backdrop-blur-md
+        sm:border-l-2 md:border-l-2
+        border-t-2 sm:border-t-0
+        border-purple-500/50
+        overflow-y-auto
+        rounded-t-2xl sm:rounded-none
+        fixed bottom-0 left-0 right-0 sm:static
+        z-[100]
+      "
     >
       {/* Header */}
       <div className="sticky top-0 bg-slate-900/95 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center justify-between z-10">
-        <h2 className="text-sm text-slate-300 uppercase tracking-wider">Карточка агента</h2>
+        <h2 className="text-sm sm:text-base text-slate-300 uppercase tracking-wider">
+          Карточка агента
+        </h2>
         <button
           onClick={onClose}
-          className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
+          className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition active:scale-95"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Avatar + name + status */}
         <div className="flex items-center gap-3">
-          <div className={`relative ${isBurned ? 'burned-filter' : ''}`}>
+          <div className={`relative shrink-0 ${isBurned ? 'burned-filter' : ''}`}>
             <img
-  src={`/avatars/${agent.avatarFile}`}
-  alt={agent.name}
-  className="pixelated w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
-/>
+              src={`${import.meta.env.BASE_URL}avatars/${agent.avatarFile}`}
+              alt={agent.name}
+              className="pixelated w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24"
+            />
           </div>
-          <div className="flex-1">
-            <h3 className="text-lg text-white leading-tight">{agent.name}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg sm:text-xl md:text-2xl text-white leading-tight font-bold truncate">
+              {agent.name}
+            </h3>
             <div className="flex items-center gap-2 mt-1">
               <span className={`w-2.5 h-2.5 rounded-full ${statusCfg.dot}`} />
-              <span className="text-xs" style={{ color: statusCfg.color }}>
+              <span className="text-sm sm:text-base" style={{ color: statusCfg.color }}>
                 {statusCfg.label}
               </span>
             </div>
@@ -248,9 +259,9 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
         {/* Wave button */}
         <button
           onClick={() => {}}
-          className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm rounded-lg border border-purple-400/50 flex items-center justify-center gap-2 transition active:scale-95"
+          className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm sm:text-base rounded-lg border border-purple-400/50 flex items-center justify-center gap-2 transition active:scale-95"
         >
-          <Hand size={16} />
+          <Hand size={18} />
           Поздороваться
         </button>
 
@@ -289,13 +300,13 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
         <div className="grid grid-cols-3 gap-2">
           <div className="p-2.5 bg-black/20 rounded-lg border border-white/5 text-center">
             <Trophy size={16} className="mx-auto text-amber-400 mb-1" />
-            <div className="text-xl font-vt text-white">{agent.deals}</div>
-            <div className="text-[10px] text-slate-400 uppercase">Сделки</div>
+            <div className="text-xl sm:text-2xl font-vt text-white">{agent.deals}</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 uppercase">Сделки</div>
           </div>
           <div className="p-2.5 bg-black/20 rounded-lg border border-white/5 text-center">
             <TrendingUp size={16} className="mx-auto text-emerald-400 mb-1" />
-            <div className="text-xl font-vt text-white">{agent.conversion}%</div>
-            <div className="text-[10px] text-slate-400 uppercase">Конверсия</div>
+            <div className="text-xl sm:text-2xl font-vt text-white">{agent.conversion}%</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 uppercase">Конверсия</div>
           </div>
           <div className="p-2.5 bg-black/20 rounded-lg border border-white/5 text-center">
             {agent.trend === 'up' ? (
@@ -304,21 +315,23 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
               <TrendingDown size={16} className="mx-auto text-red-400 mb-1" />
             )}
             <div
-              className={`text-xl font-vt ${agent.trend === 'up' ? 'text-emerald-400' : 'text-red-400'}`}
+              className={`text-xl sm:text-2xl font-vt ${
+                agent.trend === 'up' ? 'text-emerald-400' : 'text-red-400'
+              }`}
             >
               {agent.trend === 'up' ? '↑' : '↓'}
             </div>
-            <div className="text-[10px] text-slate-400 uppercase">Тренд</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 uppercase">Тренд</div>
           </div>
         </div>
 
         {/* Mapping block */}
         <div className="p-3 bg-purple-950/30 rounded-lg border border-purple-500/20 space-y-2">
-          <h4 className="text-xs text-purple-300 uppercase tracking-wide flex items-center gap-1.5">
-            <Sparkles size={14} />
+          <h4 className="text-sm sm:text-base text-purple-300 uppercase tracking-wide flex items-center gap-1.5">
+            <Sparkles size={16} />
             Маппинг метрик
           </h4>
-          <div className="space-y-1.5 text-xs text-slate-300">
+          <div className="space-y-1.5 text-sm text-slate-300">
             <div className="flex gap-2">
               <span className="text-red-400">❤️</span>
               <span>HP = % выполнения плана. &lt;50% — болеет, 50–80% — норма, &gt;80% — здоров.</span>
@@ -344,8 +357,8 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
 
         {/* Calendar */}
         <div className="space-y-2">
-          <h4 className="text-xs text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
-            <Calendar size={14} />
+          <h4 className="text-sm sm:text-base text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
+            <Calendar size={16} />
             Календарь
           </h4>
           <div className="space-y-1.5">
@@ -354,10 +367,10 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
                 key={i}
                 className="flex gap-3 p-2 bg-black/20 rounded-lg border border-white/5 hover:border-purple-500/30 transition"
               >
-                <span className="font-vt text-lg text-purple-300 leading-none mt-0.5 whitespace-nowrap">
+                <span className="font-vt text-lg sm:text-xl text-purple-300 leading-none mt-0.5 whitespace-nowrap">
                   {evt.time}
                 </span>
-                <span className="text-xs text-slate-200 leading-tight">{evt.title}</span>
+                <span className="text-sm text-slate-200 leading-tight">{evt.title}</span>
               </div>
             ))}
           </div>
@@ -377,10 +390,16 @@ function ActionPanel({
   setFilter: (f: FilterMode) => void;
   counts: { all: number; burned: number; top: number; newbie: number };
 }) {
-  const buttons: { mode: FilterMode; label: string; icon: React.ReactNode; count: number; color: string }[] = [
+  const buttons: {
+    mode: FilterMode;
+    label: string;
+    icon: React.ReactNode;
+    count: number;
+    color: string;
+  }[] = [
     { mode: 'all', label: 'Все', icon: <LayoutGrid size={16} />, count: counts.all, color: 'text-slate-300' },
     { mode: 'burned', label: 'Горящие', icon: <Flame size={16} />, count: counts.burned, color: 'text-red-400' },
-    { mode: 'top', label: 'Топ недели', icon: <Award size={16} />, count: counts.top, color: 'text-purple-400' },
+    { mode: 'top', label: 'Топ', icon: <Award size={16} />, count: counts.top, color: 'text-purple-400' },
     { mode: 'newbie', label: 'Новички', icon: <UserPlus size={16} />, count: counts.newbie, color: 'text-yellow-400' },
   ];
 
@@ -390,15 +409,15 @@ function ActionPanel({
         <button
           key={btn.mode}
           onClick={() => setFilter(btn.mode)}
-          className={`px-3 py-2 rounded-lg text-xs border flex items-center gap-1.5 transition active:scale-95 ${
+          className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm border flex items-center gap-1.5 transition active:scale-95 ${
             filter === btn.mode
               ? 'bg-purple-600/30 border-purple-500 text-white'
               : 'bg-slate-800/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200'
           }`}
         >
           <span className={btn.color}>{btn.icon}</span>
-          {btn.label}
-          <span className="ml-1 px-1.5 py-0.5 bg-black/30 rounded text-[10px]">{btn.count}</span>
+          <span className="hidden sm:inline">{btn.label}</span>
+          <span className="px-1.5 py-0.5 bg-black/30 rounded text-[10px]">{btn.count}</span>
         </button>
       ))}
     </div>
@@ -410,7 +429,7 @@ function BackgroundMap() {
   return (
     <>
       <img
-        src="/maps/map.png"
+        src={`${import.meta.env.BASE_URL}maps/map.png`}
         alt="Карта офиса и города"
         className="absolute inset-0 w-full h-full pixelated"
         style={{ zIndex: 1, objectFit: 'cover' }}
@@ -424,7 +443,7 @@ function BackgroundMap() {
           top: '4%',
           transform: 'translateX(-50%)',
           zIndex: 5,
-          fontSize: '28px',
+          fontSize: 'clamp(16px, 3vw, 28px)',
           opacity: 0.4,
           color: '#ffffff',
           textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
@@ -439,7 +458,7 @@ function BackgroundMap() {
           top: '4%',
           transform: 'translateX(-50%)',
           zIndex: 5,
-          fontSize: '28px',
+          fontSize: 'clamp(16px, 3vw, 28px)',
           opacity: 0.4,
           color: '#ffffff',
           textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
@@ -458,7 +477,7 @@ function App() {
   const [filter, setFilter] = useState<FilterMode>('all');
 
   useEffect(() => {
-    fetch('/mock-data.json')
+    fetch(`${import.meta.env.BASE_URL}mock-data.json`)
       .then((res) => res.json())
       .then((data: Agent[]) => setAgents(data))
       .catch((err) => console.error('Failed to load mock data:', err));
@@ -480,7 +499,8 @@ function App() {
       const sorted = [...agents].sort((a, b) => b.deals - a.deals);
       return new Set(sorted.map((a) => a.id));
     }
-    if (filter === 'newbie') return new Set(agents.filter((a) => a.status === 'newbie').map((a) => a.id));
+    if (filter === 'newbie')
+      return new Set(agents.filter((a) => a.status === 'newbie').map((a) => a.id));
     return new Set(agents.map((a) => a.id));
   }, [filter, agents]);
 
@@ -494,14 +514,18 @@ function App() {
   return (
     <div className="h-screen w-screen flex flex-col bg-slate-950 overflow-hidden">
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 py-2.5 bg-slate-900/95 border-b border-purple-500/30 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+      <header className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-900/95 border-b border-purple-500/30 z-50 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0">
             <Users size={18} className="text-white" />
           </div>
-          <div>
-            <h1 className="text-base text-white leading-none">Этажи — Дашборд отдела продаж</h1>
-            <p className="text-[10px] text-slate-400 mt-0.5">2D-режим · агентов на карте: {agents.length}</p>
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-base text-white leading-none truncate">
+              Этажи — Дашборд
+            </h1>
+            <p className="text-[10px] text-slate-400 mt-0.5 hidden sm:block">
+              2D-режим · агентов: {agents.length}
+            </p>
           </div>
         </div>
         <ActionPanel filter={filter} setFilter={setFilter} counts={counts} />
@@ -509,29 +533,31 @@ function App() {
 
       {/* Main area */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Map area */}
-        <div className="flex-1 relative overflow-hidden">
-          <BackgroundMap />
+        {/* Map area — горизонтальный скролл на мобилке */}
+        <div className="flex-1 relative overflow-x-auto overflow-y-hidden md:overflow-hidden">
+          <div className="relative h-full min-w-[1100px] md:min-w-0">
+            <BackgroundMap />
 
-          {/* Avatars */}
-          {sortedAgents.map((agent, i) => (
-            <AgentAvatar
-              key={agent.id}
-              agent={agent}
-              index={i}
-              isSelected={selectedId === agent.id}
-              isDimmed={filter !== 'all' && !visibleIds.has(agent.id)}
-              onClick={() => setSelectedId(agent.id)}
-            />
-          ))}
+            {/* Avatars */}
+            {sortedAgents.map((agent, i) => (
+              <AgentAvatar
+                key={agent.id}
+                agent={agent}
+                index={i}
+                isSelected={selectedId === agent.id}
+                isDimmed={filter !== 'all' && !visibleIds.has(agent.id)}
+                onClick={() => setSelectedId(agent.id)}
+              />
+            ))}
 
-          {/* Burned alert banner */}
-          {filter === 'burned' && counts.burned > 0 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-red-950/80 border border-red-500/50 rounded-lg flex items-center gap-2 text-sm text-red-300 backdrop-blur-sm z-40">
-              <AlertTriangle size={16} />
-              {counts.burned} агент(ов) в красной зоне (HP &lt; 50%)
-            </div>
-          )}
+            {/* Burned alert banner */}
+            {filter === 'burned' && counts.burned > 0 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-2 bg-red-950/80 border border-red-500/50 rounded-lg flex items-center gap-2 text-xs sm:text-sm text-red-300 backdrop-blur-sm z-40 whitespace-nowrap">
+                <AlertTriangle size={16} />
+                {counts.burned} агент(ов) в красной зоне
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right panel: agent card */}
@@ -543,10 +569,8 @@ function App() {
       </div>
 
       {/* Footer */}
-      <footer className="px-4 py-1.5 bg-slate-900/95 border-t border-purple-500/20 flex items-center justify-between z-50">
-        <p className="text-[10px] text-slate-500">
-          Этажи Sales Dashboard · v1.0
-        </p>
+      <footer className="px-3 sm:px-4 py-1.5 bg-slate-900/95 border-t border-purple-500/20 flex items-center justify-between z-50">
+        <p className="text-[10px] text-slate-500">Этажи Sales Dashboard · v1.0</p>
         <a
           href="https://lpc.opengameart.org"
           target="_blank"
