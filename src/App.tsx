@@ -184,8 +184,11 @@ function AgentAvatar({
         <img
   src={`/avatars/${agent.avatarFile}`}
   alt={agent.name}
-  className="pixelated w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
-        />
+  width={96}
+  height={96}
+  className="pixelated"
+  style={{ width: 96, height: 96 }}
+/>
         {/* Status dot */}
         <div
           className={`absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 status-dot-pulse ${statusCfg.dot}`}
@@ -226,13 +229,10 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
         <div className="flex items-center gap-3">
           <div className={`relative ${isBurned ? 'burned-filter' : ''}`}>
             <img
-              src={`/avatars/${agent.avatarFile}`}
-              alt={agent.name}
-              width={96}
-              height={96}
-              className="pixelated"
-              style={{ width: 96, height: 96 }}
-            />
+  src={`/avatars/${agent.avatarFile}`}
+  alt={agent.name}
+  className="pixelated w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
+/>
           </div>
           <div className="flex-1">
             <h3 className="text-lg text-white leading-tight">{agent.name}</h3>
