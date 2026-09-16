@@ -13,6 +13,7 @@ import {
   Sparkles,
   Calendar,
   X,
+  Check,
   AlertTriangle,
   Award,
   UserPlus,
@@ -118,6 +119,7 @@ interface AgentAvatarProps {
   isSelected: boolean;
   isDimmed: boolean;
   isDragging: boolean;
+  wavingId: string | null;
   onPointerDown: (e: React.PointerEvent, agentId: string) => void;
   onPointerMove: (e: React.PointerEvent) => void;
   onPointerUp: (e: React.PointerEvent) => void;
@@ -129,6 +131,7 @@ function AgentAvatar({
   isSelected,
   isDimmed,
   isDragging,
+  wavingId,
   onPointerDown,
   onPointerMove,
   onPointerUp,
@@ -137,10 +140,11 @@ function AgentAvatar({
   const isBurned = agent.status === 'burned';
   const isYou = agent.id === 'rop';
   const bobClass = BOB_CLASSES[index % BOB_CLASSES.length];
+  const isWaving = !isDragging && wavingId === agent.id;
 
   return (
     <div
-      className="absolute cursor-grab active:cursor-grabbing"
+      className={`absolute cursor-grab active:cursor-grabbing${isWaving ? ' wave-animation' : ''}`}
       style={{
         left: `${agent.x}%`,
         top: `${agent.y}%`,
@@ -167,6 +171,7 @@ function AgentAvatar({
           className="px-2 py-0.5 bg-slate-900/90 text-white text-xs font-medium rounded-sm border whitespace-nowrap"
           style={{ borderColor: statusCfg.color, boxShadow: `0 2px 8px ${statusCfg.color}40` }}
         >
+          {isWaving ? '👋 ' : ''}
           {agent.name.split(' ')[0]}
         </div>
         {/* Mini bars */}
@@ -219,9 +224,20 @@ function AgentAvatar({
 }
 
 // ─── Agent Detail Card ───────────────────────────────────
-function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
+function AgentCard({
+  agent,
+  onClose,
+  onWave,
+  greetedId,
+}: {
+  agent: Agent;
+  onClose: () => void;
+  onWave: (agentId: string) => void;
+  greetedId: string | null;
+}) {
   const statusCfg = STATUS_CONFIG[agent.status];
   const isBurned = agent.status === 'burned';
+  const isGreeted = greetedId === agent.id;
 
   return (
     <motion.div
@@ -280,11 +296,15 @@ function AgentCard({ agent, onClose }: { agent: Agent; onClose: () => void }) {
 
         {/* Wave button */}
         <button
-          onClick={() => {}}
-          className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm sm:text-base font-medium rounded-lg border border-purple-400/50 flex items-center justify-center gap-2 transition active:scale-95"
+          onClick={() => onWave(agent.id)}
+          className={`w-full py-3 text-white text-sm sm:text-base font-medium rounded-lg flex items-center justify-center gap-2 transition active:scale-95 ${
+            isGreeted
+              ? 'bg-green-600 border border-green-400/50'
+              : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-400/50'
+          }`}
         >
-          <Hand size={20} />
-          Поздороваться
+          {isGreeted ? <Check size={20} /> : <Hand size={20} />}
+          {isGreeted ? 'Привет отправлен ✓' : 'Поздороваться'}
         </button>
 
         {/* Stat bars */}
@@ -515,6 +535,8 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterMode>('all');
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [wavingId, setWavingId] = useState<string | null>(null);
+  const [greetedId, setGreetedId] = useState<string | null>(null);
 
   // Ref для хранения данных о drag (не вызывает ре-рендер)
   const dragRef = useRef<{
@@ -529,12 +551,34 @@ function App() {
 
   // Ref на контейнер карты — нужен для расчёта процентов
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const waveTimeoutRef = useRef<number | null>(null);
+
+  const handleWave = useCallback((agentId: string) => {
+    setWavingId(agentId);
+    setGreetedId(agentId);
+    if (waveTimeoutRef.current !== null) {
+      window.clearTimeout(waveTimeoutRef.current);
+    }
+    waveTimeoutRef.current = window.setTimeout(() => {
+      setWavingId(null);
+      setGreetedId(null);
+      waveTimeoutRef.current = null;
+    }, 2000);
+  }, []);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}mock-data.json`)
       .then((res) => res.json())
       .then((data: Agent[]) => setAgents(data))
       .catch((err) => console.error('Failed to load mock data:', err));
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (waveTimeoutRef.current !== null) {
+        window.clearTimeout(waveTimeoutRef.current);
+      }
+    };
   }, []);
 
   // ─── Drag handlers ─────────────────────────────────────
@@ -688,6 +732,7 @@ function App() {
                 isSelected={selectedId === agent.id}
                 isDimmed={filter !== 'all' && !visibleIds.has(agent.id)}
                 isDragging={draggingId === agent.id}
+                wavingId={wavingId}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
@@ -707,7 +752,12 @@ function App() {
         {/* Right panel: agent card */}
         <AnimatePresence>
           {selectedAgent && (
-            <AgentCard agent={selectedAgent} onClose={() => setSelectedId(null)} />
+            <AgentCard
+              agent={selectedAgent}
+              onClose={() => setSelectedId(null)}
+              onWave={handleWave}
+              greetedId={greetedId}
+            />
           )}
         </AnimatePresence>
       </div>
