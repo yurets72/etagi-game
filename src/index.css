@@ -3,22 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --font-pixel: 'Pixelify Sans', monospace;
-  --font-vt: 'VT323', monospace;
-}
-
-* {
-  font-family: var(--font-pixel);
+  --font-pixel: 'Handjet', 'Pixelify Sans', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 body {
-  margin: 0;
-  background: #1a1a2e;
-  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: 15px; /* базовый размер для десктопа */
 }
 
+/* Пиксельный шрифт — только для акцентных элементов */
+.font-pixel,
 .font-vt {
-  font-family: var(--font-vt);
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .pixelated {
